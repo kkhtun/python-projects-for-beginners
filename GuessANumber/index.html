@@ -1,0 +1,166 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess A Number</title>
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+</head>
+
+<body class="p-4 bg-blue-300">
+    <section class="grid grid-cols-2 text-center max-w-xl mx-auto">
+        <div>
+            <label for="lower">Lower Range</label>
+            <br>
+            <input type="number" name="lower" id="lower" value="1"
+                class="text-center rounded-full border border-1 border-green-400">
+        </div>
+        <div>
+            <label for="upper">Upper Range</label>
+            <br>
+            <input type="number" name="upper" id="upper" value="10"
+                class="text-center rounded-full border border-1 border-green-400">
+        </div>
+    </section>
+    <div id="box" class="text-center mt-6 max-w-sm mx-auto p-4 border border-2 border-gray-400">
+        <label for="guessed_num">Guess your number here</label>
+        <br>
+        <input type="number" name="guess" id="guessed_num"
+            class="text-center rounded-full border border-1 border-green-400">
+        <div class="text-semibold text-xl">
+            <button class="mt-2 mx-auto text-center rounded-xl bg-green-500 py-2 px-4 hover:bg-green-200"
+                id="guess">Guess</button>
+            <button class="mt-2 mx-auto text-center rounded-xl bg-yellow-500 py-2 px-4 hover:bg-yellow-200"
+                id="reset">Reset</button>
+        </div>
+        <div id="lives" class="mt-2 text-xl text-red-600">You have 0 Lives Left</div>
+    </div>
+
+    <section>
+        <div id="result" class="text-center mt-4 max-w-xl mx-auto">
+            <p class="text-bold text-xl bg-green-100 py-2 px-3">Please guess something..</p>
+            <div id="gif">
+                <div class="hidden tenor-gif-embed guess" data-postid="5789210" data-share-method="host"
+                    data-width="100%" data-aspect-ratio="1.0"><a
+                        href="https://tenor.com/view/guess-dog-gif-5789210">Guess GIF</a> from <a
+                        href="https://tenor.com/search/guess-gifs">Guess GIFs</a></div>
+
+                <div class="hidden tenor-gif-embed win" data-postid="7413222" data-share-method="host" data-width="100%"
+                    data-aspect-ratio="2.193832599118943"><a
+                        href="https://tenor.com/view/obama-micdrop-gif-7413222">Obama
+                        Mic Drop GIF</a> from <a href="https://tenor.com/search/obama-gifs">Obama GIFs</a></div>
+
+                <!-- <div class="hidden tenor-gif-embed lose" data-postid="4879950" data-share-method="host" data-width="100%"
+                    data-aspect-ratio="2.169811320754717"><a
+                        href="https://tenor.com/view/party-over-samuel-jackson-starwars-windu-gif-4879950">Party Over
+                        Samuel
+                        Jackson GIF</a> from <a href="https://tenor.com/search/partyover-gifs">Partyover GIFs</a></div> -->
+
+                <div class="hidden tenor-gif-embed lose" data-postid="16003613" data-share-method="host"
+                    data-width="100%" data-aspect-ratio="1.7785714285714287"><a
+                        href="https://tenor.com/view/disappointment-disappointed-food-review-meme-gif-16003613">Disappointment
+                        Disappointed GIF</a> from <a href="https://tenor.com/search/disappointment-gifs">Disappointment
+                        GIFs</a></div>
+
+                <div class="tenor-gif-embed try" data-postid="13293587" data-share-method="host" data-width="100%"
+                    data-aspect-ratio="1.7785714285714287"><a
+                        href="https://tenor.com/view/anime-loli-dragon-girl-kanna-gif-13293587">Anime Loli GIF</a>
+                    from <a href="https://tenor.com/search/anime-gifs">Anime GIFs</a></div>
+            </div>
+        </div>
+    </section>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script>
+    $(document).ready(function () {
+        window.random_num = -1;
+        resetLives();
+
+        $("#gif").children().addClass("hidden");
+        $("#gif .guess").toggleClass("hidden");
+
+        $("#guess").on("click", function () {
+            if (random_num < 0) {
+                random_num = setRandomNumber();
+            }
+            console.log(random_num);
+
+            $("#box").addClass("bg-gray-300");
+            setTimeout(function () {
+                $("#box").removeClass("bg-gray-300");
+            }, 300);
+
+            var guessed_num = $("#guessed_num").val();
+            if (!guessed_num) {
+                $("#result p").text("Please guess something..");
+            } else if (guessed_num > random_num) {
+                $("#result p").text("Your guess is higher! Try again");
+                reduceLives();
+            } else if (guessed_num < random_num) {
+                $("#result p").text("Your guess is lower! Try again");
+                reduceLives();
+            } else {
+                $("#result p").text("Congrats! You guessed the letter, it was " + guessed_num);
+                $("#guess").prop("disabled", true);
+
+                $("#gif").children().addClass("hidden");
+                $("#gif .win").toggleClass("hidden");
+            }
+        });
+
+        $("#reset").on("click", function () {
+            random_num = -1;
+            resetLives();
+            $("#result p").text("Please guess something..");
+            $("#guessed_num").val("");
+            $("#lower").prop("disabled", false);
+            $("#upper").prop("disabled", false);
+            $("#guess").prop("disabled", false);
+
+            $("#gif").children().addClass("hidden");
+            $("#gif .guess").toggleClass("hidden");
+        });
+
+        function getRandomIntInclusive(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1) +
+                min); //The maximum is inclusive and the minimum is inclusive
+        }
+
+        function setRandomNumber() {
+            var lower = $("#lower").val();
+            var upper = $("#upper").val();
+            random_num = getRandomIntInclusive(lower, upper);
+            $("#lower").prop("disabled", true);
+            $("#upper").prop("disabled", true);
+            return random_num
+        }
+
+        function reduceLives() {
+            lives = lives - 1;
+
+            $("#gif").children().addClass("hidden");
+            $("#gif .try").toggleClass("hidden");
+
+            $("#lives").text("You have " + lives + " lives left");
+            if (lives <= 0) {
+                $("#result p").text("Game over, better luck next time!");
+                $("#guess").prop("disabled", true);
+
+                $("#gif").children().addClass("hidden");
+                $("#gif .lose").toggleClass("hidden");
+            }
+        }
+
+        function resetLives() {
+            window.lives = 3;
+            $("#lives").text("You have " + lives + " lives left");
+        }
+    });
+</script>
+
+</html>
